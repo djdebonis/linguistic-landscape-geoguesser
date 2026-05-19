@@ -34,9 +34,21 @@ if st.button("Predict Coordinates"):
         st.write(f"Latitude: `{pred_lat:.6f}`")
         st.write(f"Longitude: `{pred_lon:.6f}`")
 
+        DATA_PATH = "output/cleaned_concatenated.csv"
+
+        df = pd.read_csv(DATA_PATH)
+
         # basic graph
         fig, ax = plt.subplots(figsize=(8, 6))
 
+        ax.scatter(
+            df["longitude"],
+            df["latitude"],
+            alpha=0.4,
+            s=50,
+            label="Training Intersections"
+        )
+        
         ax.scatter(
             pred_lon,
             pred_lat,
