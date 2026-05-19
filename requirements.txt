@@ -1,4 +1,4 @@
 streamlit
 pandas
 joblib
-matplotlib.pyplot as plt
+matplotlib
