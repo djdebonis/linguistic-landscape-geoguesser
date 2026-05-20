@@ -135,7 +135,7 @@ table = {
     "intersection":	[intersection_code],
     "text_blob": [intersection_text],
     "latitude": [actual_lat],
-    "longitude": [acutal_lon],
+    "longitude": [actual_lon],
     "code_type": ["mixed"]
 }
 
