@@ -3,6 +3,7 @@ import pandas as pd
 import joblib
 import matplotlib.pyplot as plt
 import numpy as np
+from datetime import datetime
 
 MODEL_PATH = "models/coord_model.joblib"
 
@@ -40,6 +41,12 @@ intersection_text = st.text_area(
     "Text from signs/intersection",
     placeholder="taqueria mercado wireless pho smoke shop..."
 )
+
+intersection_code = st.text_area(
+    "Actual Intersection code, ideally with E-W street followed by N-S street, combined with a hyphen. E.g lincoln-chambers or colfax-yosemite",
+    placeholder = "lincoln-parker"
+)
+    
 
 actual_lat = st.number_input(
     "Actual latitude",
@@ -120,3 +127,19 @@ if st.button("Predict and Compare"):
         ax.legend()
 
         st.pyplot(fig)
+
+# export data 
+timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
+table = {
+    "intersection":	intersection_code,
+    "text_on_sign_exact": intersection_text,
+    "code_type": "other"
+}
+
+df = pd.DataFrame(table)
+
+SAVE_PATH = str(f"practice_outputs/{intersection_code}{timestamp}.csv")
+
+# export to local repo
+pd.to_csv(SAVE_PATH)
