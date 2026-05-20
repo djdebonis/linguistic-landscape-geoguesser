@@ -142,4 +142,4 @@ df = pd.DataFrame(table)
 SAVE_PATH = str(f"practice_outputs/{intersection_code}{timestamp}.csv")
 
 # export to local repo
-df.to_csv(SAVE_PATH)
+df.to_excel(SAVE_PATH)
