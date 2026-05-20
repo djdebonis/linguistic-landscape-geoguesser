@@ -139,7 +139,7 @@ table = {
 
 df = pd.DataFrame(table)
 
-SAVE_PATH = str(f"practice_outputs/{intersection_code}{timestamp}.csv")
+SAVE_PATH = str(f"practice_outputs/{intersection_code}{timestamp}.xlsx")
 
 # export to local repo
 df.to_excel(SAVE_PATH)
