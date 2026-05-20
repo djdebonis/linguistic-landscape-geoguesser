@@ -132,9 +132,9 @@ if st.button("Predict and Compare"):
 timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
 table = {
-    "intersection":	intersection_code,
-    "text_on_sign_exact": intersection_text,
-    "code_type": "other"
+    "intersection":	[intersection_code],
+    "text_on_sign_exact": [intersection_text],
+    "code_type": ["mixed"]
 }
 
 df = pd.DataFrame(table)
