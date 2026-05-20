@@ -53,10 +53,10 @@ actual_lon = st.number_input(
 )
 
 if st.button("Predict and Compare"):
-    if user_text.strip() == "":
+    if intersection_text.strip() == "":
         st.warning("Enter some text first.")
     else:
-        pred = coord_model.predict([user_text])
+        pred = coord_model.predict([intersection_text])
 
         pred_lat = pred[0][0]
         pred_lon = pred[0][1]
