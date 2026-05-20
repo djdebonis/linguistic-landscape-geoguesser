@@ -133,13 +133,20 @@ timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 
 table = {
     "intersection":	[intersection_code],
-    "text_on_sign_exact": [intersection_text],
+    "text_blob": [intersection_text],
+    "latitude": [actual_lat],
+    "longitude": [acutal_lon],
     "code_type": ["mixed"]
 }
 
 df = pd.DataFrame(table)
 
-SAVE_PATH = str(f"practice_outputs/{intersection_code}{timestamp}.csv")
 
-# export to local repo
-df.to_csv(SAVE_PATH)
+csv = df.to_csv(index=False)
+
+st.download_button(
+    label="Download this entry as CSV",
+    data=csv,
+    file_name=f"{intersection_code}_{timestamp}.csv",
+    mime="text/csv"
+)
