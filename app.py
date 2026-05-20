@@ -14,7 +14,7 @@ def load_model():
 coord_model = load_model()
 
 # import existing intersections to plot
-intersection_df = "output/cleaned_concatenated.csv"
+intersection_df = pd.read_csv("output/cleaned_concatenated.csv")
 
 def haversine_distance(lat1, lon1, lat2, lon2):
     R = 6371
