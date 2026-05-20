@@ -11,20 +11,52 @@ def load_model():
 
 coord_model = load_model()
 
+def haversine_distance(lat1, lon1, lat2, lon2):
+    R = 6371
+
+    lat1 = np.radians(lat1)
+    lon1 = np.radians(lon1)
+    lat2 = np.radians(lat2)
+    lon2 = np.radians(lon2)
+
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+
+    a = (
+        np.sin(dlat / 2) ** 2
+        + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2) ** 2
+    )
+
+    c = 2 * np.arcsin(np.sqrt(a))
+
+    return R * c
+
 st.title("Linguistic Landscape GeoGuesser")
 
 st.subheader("Enter linguistic landscape text")
 
-user_text = st.text_area(
+intersection_text = st.text_area(
     "Text from signs/intersection",
     placeholder="taqueria mercado wireless pho smoke shop..."
 )
 
+actual_lat = st.number_input(
+    "Actual latitude",
+    value=39.7392,
+    format="%.6f"
+)
+
+actual_lon = st.number_input(
+    "Actual longitude",
+    value=-104.9903,
+    format="%.6f"
+)
+
 if st.button("Predict Coordinates"):
-    if user_text.strip() == "":
+    if intersection_text.strip() == "":
         st.warning("Enter some text first.")
     else:
-        pred = coord_model.predict([user_text])
+        pred = coord_model.predict([intersection_text])
 
         pred_lat = pred[0][0]
         pred_lon = pred[0][1]
