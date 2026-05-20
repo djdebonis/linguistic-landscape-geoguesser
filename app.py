@@ -13,6 +13,9 @@ def load_model():
 
 coord_model = load_model()
 
+# import existing intersections to plot
+intersection_df = "output/cleaned_concatenated.csv"
+
 def haversine_distance(lat1, lon1, lat2, lon2):
     R = 6371
 
@@ -87,6 +90,19 @@ if st.button("Predict and Compare"):
         st.write(f"Longitude: `{actual_lon:.6f}`")
 
         fig, ax = plt.subplots(figsize=(8, 6))
+
+
+        ax.text(-104.996583333333, 39.74852777777778,"Downtown Denver")
+        ax.text(-104.875277777777, 39.74022222222222, "Aurora on Colfax")
+        ax.text(-104.768055555555, 39.53711111111111, "Parker/Lincoln")
+
+        ax.scatter(
+            intersection_df["longitude"],
+            intersection_dfdf["latitude"],
+            alpha=0.4,
+            s=50,
+            label="Training Intersections"
+        )
 
         ax.scatter(
             actual_lon,
