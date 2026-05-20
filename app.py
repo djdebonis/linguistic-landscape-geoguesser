@@ -98,7 +98,7 @@ if st.button("Predict and Compare"):
 
         ax.scatter(
             intersection_df["longitude"],
-            intersection_dfdf["latitude"],
+            intersection_df["latitude"],
             alpha=0.4,
             s=50,
             label="Training Intersections"
