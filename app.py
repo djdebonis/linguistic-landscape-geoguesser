@@ -52,35 +52,42 @@ actual_lon = st.number_input(
     format="%.6f"
 )
 
-if st.button("Predict Coordinates"):
-    if intersection_text.strip() == "":
+if st.button("Predict and Compare"):
+    if user_text.strip() == "":
         st.warning("Enter some text first.")
     else:
-        pred = coord_model.predict([intersection_text])
+        pred = coord_model.predict([user_text])
 
         pred_lat = pred[0][0]
         pred_lon = pred[0][1]
 
-        st.success("Predicted coordinates:")
+        error_km = haversine_distance(
+            actual_lat,
+            actual_lon,
+            pred_lat,
+            pred_lon
+        )
 
+        st.success(f"Model was {error_km:.2f} km away.")
+
+        st.write("### Predicted Coordinates")
         st.write(f"Latitude: `{pred_lat:.6f}`")
         st.write(f"Longitude: `{pred_lon:.6f}`")
 
-        DATA_PATH = "output/cleaned_concatenated.csv"
+        st.write("### Actual Coordinates")
+        st.write(f"Latitude: `{actual_lat:.6f}`")
+        st.write(f"Longitude: `{actual_lon:.6f}`")
 
-        df = pd.read_csv(DATA_PATH)
-
-        # basic graph
         fig, ax = plt.subplots(figsize=(8, 6))
 
         ax.scatter(
-            df["longitude"],
-            df["latitude"],
-            alpha=0.4,
-            s=50,
-            label="Training Intersections"
+            actual_lon,
+            actual_lat,
+            color="blue",
+            s=120,
+            label="Actual"
         )
-        
+
         ax.scatter(
             pred_lon,
             pred_lat,
@@ -89,16 +96,26 @@ if st.button("Predict Coordinates"):
             label="Model Prediction"
         )
 
+        ax.plot(
+            [actual_lon, pred_lon],
+            [actual_lat, pred_lat],
+            color="gray",
+            alpha=0.7
+        )
+
+        mid_x = (actual_lon + pred_lon) / 2
+        mid_y = (actual_lat + pred_lat) / 2
+
         ax.text(
-            pred_lon,
-            pred_lat,
-            " Predicted Point",
+            mid_x,
+            mid_y,
+            f"{error_km:.2f} km",
             fontsize=10
         )
 
         ax.set_xlabel("Longitude")
         ax.set_ylabel("Latitude")
-        ax.set_title("Predicted Geographic Location")
+        ax.set_title("Actual vs Predicted Location")
         ax.legend()
 
         st.pyplot(fig)
