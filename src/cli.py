@@ -2,7 +2,14 @@ import click
 import pandas as pd
 
 from .data.loader import prepare_training_data
-from .models.model import create_coord_model, save_model, train_coord_model
+from .models.model import (
+    create_coord_model,
+    evaluate_model,
+    predictions_dataframe,
+    save_model,
+    split_dataset,
+    train_coord_model,
+)
 from .predict.predict import predict_text
 
 
@@ -32,15 +39,55 @@ def prepare_data(input_pattern: str, coord_csv: str, output_csv: str, coord_col:
 @click.option("--data-csv", required=True, help="Cleaned training dataset CSV path.")
 @click.option("--model-path", required=True, help="File path to save the trained model.")
 @click.option("--alpha", default=0.1, help="Ridge regularization strength.")
-def train_model(data_csv: str, model_path: str, alpha: float) -> None:
-    """Train the coordinate prediction model."""
+@click.option("--test-size", default=0.2, help="Proportion of data to reserve for testing.")
+@click.option("--random-state", default=42, help="Random seed for train/test splitting.")
+@click.option("--train-output-csv", default=None, help="Optional CSV path to save train actual vs predicted results.")
+@click.option("--test-output-csv", default=None, help="Optional CSV path to save test actual vs predicted results.")
+def train_model(
+    data_csv: str,
+    model_path: str,
+    alpha: float,
+    test_size: float,
+    random_state: int,
+    train_output_csv: str | None,
+    test_output_csv: str | None,
+) -> None:
+    """Train the coordinate prediction model and evaluate it on a held-out test set."""
     df = pd.read_csv(data_csv)
-    model = create_coord_model(alpha=alpha)
     X = df["text_blob"]
     y = df[["latitude", "longitude"]]
-    trained = train_coord_model(model, X, y)
+
+    X_train, X_test, y_train, y_test = split_dataset(
+        X,
+        y,
+        test_size=test_size,
+        random_state=random_state,
+    )
+
+    model = create_coord_model(alpha=alpha)
+    trained = train_coord_model(model, X_train, y_train)
     save_model(trained, model_path)
+
+    train_metrics = evaluate_model(trained, X_train, y_train)
+    test_metrics = evaluate_model(trained, X_test, y_test)
+
     click.echo(f"Trained model saved to {model_path}")
+    click.echo(
+        f"Train MAE latitude={train_metrics['mae_latitude']:.4f}, longitude={train_metrics['mae_longitude']:.4f}"
+    )
+    click.echo(
+        f"Test MAE  latitude={test_metrics['mae_latitude']:.4f}, longitude={test_metrics['mae_longitude']:.4f}"
+    )
+
+    if train_output_csv:
+        train_df = predictions_dataframe(trained, X_train, y_train)
+        train_df.to_csv(train_output_csv, index=False)
+        click.echo(f"Saved train predictions to {train_output_csv}")
+
+    if test_output_csv:
+        test_df = predictions_dataframe(trained, X_test, y_test)
+        test_df.to_csv(test_output_csv, index=False)
+        click.echo(f"Saved test predictions to {test_output_csv}")
 
 
 @cli.command("predict")

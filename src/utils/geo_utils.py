@@ -1,5 +1,6 @@
 # geo_utils.py
 import regex as re
+import numpy as np
 
 def dms_to_decimal(degrees, minutes, seconds, direction):
     decimal = degrees + minutes / 60 + seconds / 3600
@@ -49,6 +50,38 @@ def parse_dms_coordinate(coord_string):
 
     return lat, lon
 
+
+def haversine_distance(lat1, lon1, lat2, lon2):
+    """
+    Calculate great-circle distance between two points on Earth.
+    
+    Returns distance in kilometers.
+    """
+
+    R = 6371  # Earth radius in km
+
+    # convert degrees to radians
+    lat1 = np.radians(lat1)
+    lon1 = np.radians(lon1)
+
+    lat2 = np.radians(lat2)
+    lon2 = np.radians(lon2)
+
+    # differences
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+
+    # haversine formula
+    a = (
+        np.sin(dlat / 2) ** 2
+        + np.cos(lat1)
+        * np.cos(lat2)
+        * np.sin(dlon / 2) ** 2
+    )
+
+    c = 2 * np.arcsin(np.sqrt(a))
+
+    return R * c
 
 def greet():
     print("hello from geo_utils")

@@ -5,8 +5,11 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_absolute_error
+from sklearn.model_selection import train_test_split
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.pipeline import Pipeline
+
+from ..utils.geo_utils import haversine_distance
 
 
 def create_coord_model(alpha: float = 0.1) -> Pipeline:
@@ -38,6 +41,21 @@ def train_coord_model(
     return model
 
 
+def split_dataset(
+    X: pd.Series,
+    y: pd.DataFrame,
+    test_size: float = 0.2,
+    random_state: int = 42,
+):
+    """Split text and coordinate labels into train/test subsets."""
+    return train_test_split(
+        X,
+        y,
+        test_size=test_size,
+        random_state=random_state,
+    )
+
+
 def save_model(model: Pipeline, path: str) -> None:
     """Save a trained model to a file."""
     output_path = Path(path)
@@ -64,3 +82,26 @@ def evaluate_model(
         "mae_longitude": mean_absolute_error(y_test["longitude"], y_pred[:, 1]),
     }
     return results
+
+
+def predictions_dataframe(
+    model: Pipeline,
+    X: pd.Series,
+    y: pd.DataFrame,
+) -> pd.DataFrame:
+    """Return a DataFrame with actual and predicted coordinates."""
+    predictions = model.predict(X)
+    predictions_df = pd.DataFrame({
+        "text_blob": X.reset_index(drop=True),
+        "actual_latitude": y["latitude"].reset_index(drop=True),
+        "actual_longitude": y["longitude"].reset_index(drop=True),
+        "pred_latitude": predictions[:, 0],
+        "pred_longitude": predictions[:, 1],
+    })
+    predictions_df["error_km"] = haversine_distance(
+        predictions_df["actual_latitude"],
+        predictions_df["actual_longitude"],
+        predictions_df["pred_latitude"],
+        predictions_df["pred_longitude"]
+        )
+    return predictions_df
