@@ -6,7 +6,7 @@ from pathlib import Path
 import click
 import pandas as pd
 
-from .data.loader import prepare_training_data
+from .data.loader import prepare_training_data, prepare_sampled_training_data
 from .models.model import (
     create_coord_model,
     evaluate_model,
@@ -104,6 +104,39 @@ def prepare_data(input_pattern: str, coord_csv: str, output_csv: str, coord_col:
     click.echo(f"Prepared training data and wrote {output_csv}")
 
 
+@cli.command("prepare-sampled-data")
+@click.option("--input-pattern", required=True, help="Glob pattern for raw spreadsheet files.")
+@click.option("--coord-csv", required=True, help="CSV file containing coordinate lookup data.")
+@click.option("--output-csv", required=True, help="Output path for the sampled dataset CSV.")
+@click.option("--coord-col", default="cd", help="Column name containing DMS coordinates.")
+@click.option("--n-samples", default=50, show_default=True, help="Samples per intersection.")
+@click.option("--min-size", default=3, show_default=True, help="Minimum signs per sample.")
+@click.option("--max-size", default=7, show_default=True, help="Maximum signs per sample.")
+@click.option("--seed", default=42, show_default=True, help="Random seed for sampled generation.")
+def prepare_sampled_data(
+    input_pattern: str,
+    coord_csv: str,
+    output_csv: str,
+    coord_col: str,
+    n_samples: int,
+    min_size: int,
+    max_size: int,
+    seed: int,
+) -> None:
+    """Prepare sampled training data by creating random text samples per intersection."""
+    prepare_sampled_training_data(
+        input_pattern=input_pattern,
+        coord_csv=coord_csv,
+        output_csv=output_csv,
+        coord_col=coord_col,
+        n_samples=n_samples,
+        min_size=min_size,
+        max_size=max_size,
+        seed=seed,
+    )
+    click.echo(f"Prepared sampled training data and wrote {output_csv}")
+
+
 @cli.command("train-model")
 @click.option("--data-csv", required=True, help="Cleaned training dataset CSV path.")
 @click.option("--model-path", required=True, help="File path to save the trained model.")
@@ -125,12 +158,14 @@ def train_model(
     df = pd.read_csv(data_csv)
     X = df["text_blob"]
     y = df[["latitude", "longitude"]]
+    groups = df["intersection"] if "intersection" in df.columns else None
 
     X_train, X_test, y_train, y_test = split_dataset(
         X,
         y,
         test_size=test_size,
         random_state=random_state,
+        groups=groups,
     )
 
     model = create_coord_model(alpha=alpha)

@@ -5,7 +5,7 @@ import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import Ridge
 from sklearn.metrics import mean_absolute_error
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GroupShuffleSplit, train_test_split
 from sklearn.multioutput import MultiOutputRegressor
 from sklearn.pipeline import Pipeline
 
@@ -46,14 +46,28 @@ def split_dataset(
     y: pd.DataFrame,
     test_size: float = 0.2,
     random_state: int = 42,
+    groups: pd.Series | None = None,
 ):
-    """Split text and coordinate labels into train/test subsets."""
-    return train_test_split(
-        X,
-        y,
+    """Split text and coordinate labels into train/test subsets.
+
+    If groups are provided, perform a group-aware split so all rows
+    from the same group stay together in train or test.
+    """
+    if groups is None:
+        return train_test_split(
+            X,
+            y,
+            test_size=test_size,
+            random_state=random_state,
+        )
+
+    splitter = GroupShuffleSplit(
+        n_splits=1,
         test_size=test_size,
         random_state=random_state,
     )
+    train_idx, test_idx = next(splitter.split(X, y, groups))
+    return X.iloc[train_idx], X.iloc[test_idx], y.iloc[train_idx], y.iloc[test_idx]
 
 
 def save_model(model: Pipeline, path: str) -> None:

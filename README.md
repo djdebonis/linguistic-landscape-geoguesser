@@ -3,6 +3,8 @@ A software and app seeking to predict geographic location or locale based on lin
 
 ## Loading and Cleaning the Data
 
+For a basic model where all of the strings of text of an intersection are combined into a single "row," use this:
+
 ```bash
 python -m src.cli prepare-data \
   --input-pattern "data/raw/test2026-06-13/*.xlsx" \
@@ -10,7 +12,17 @@ python -m src.cli prepare-data \
   --output-csv "data/processed/cleaned_concatenated.csv"
 ```
 
-
+For a model that creates random samples by intersection (so that prediction data requires less input), use this functionality:
+```bash
+python -m src.cli prepare-sampled-data \
+  --input-pattern "data/raw/test2026-06-13/*.xlsx" \
+  --coord-csv "data/raw/coordinate_dict/coordinate_dict2026-05-29.csv" \
+  --output-csv "data/processed/cleaned_sampled.csv" \
+  --n-samples 50 \
+  --min-size 5 \
+  --max-size 10 \
+  --seed 42
+```
 ## Training the Model
 
 The model can be trained with the data in `data/processed/cleaned_concatenated.csv`, which was extracted from the raw data in `data/raw/` in the loading/cleaning function above.
@@ -34,6 +46,6 @@ If `data/processed/test_predictions.csv` already exists, the CLI will write a ne
 
 ```bash
 python -m src.cli plot-predictions \
-  --prediction-csv data/processed/filename.csv \
+  --prediction-csv data/processed/test_predictions_20260613T071057_82c0b679.csv \
   --output-dir data/plots
 ```
