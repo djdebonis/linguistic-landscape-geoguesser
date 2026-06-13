@@ -37,7 +37,7 @@ python -m src.cli train-model \
   --data-csv data/processed/cleaned_concatenated.csv \
   --model-path models/coord_model.joblib \
   --test-output-csv data/processed/test_predictions.csv \
-  --alpha 0.1 \
+  --alpha 0.01 \
   --test-size 0.2 \
   --random-state 42
 ```
@@ -60,5 +60,5 @@ If `data/processed/test_predictions.csv` already exists, the CLI will write a ne
 
 ```bash
 python -m src.cli plot-predictions \
-  --prediction-csv 
+  --prediction-csv filename.csv
 ```
