@@ -8,11 +8,11 @@ For a basic model where all of the strings of text of an intersection are combin
 ```bash
 python -m src.cli prepare-data \
   --input-pattern "data/raw/test2026-06-13/*.xlsx" \
-  --coord-csv "data/raw/coordinate_dict/coordinate_dict2026-05-29.csv" \
+  --coord-csv "data/raw/coordinate_dict/coordinate_dict2026-06-13.csv" \
   --output-csv "data/processed/cleaned_concatenated.csv"
 ```
 
-For a model that creates random samples by intersection (so that prediction data requires less input), use this functionality:
+For a model that creates random samples by intersection, based on a count of strings (so that prediction data requires less input), use this functionality:
 ```bash
 python -m src.cli prepare-sampled-data \
   --input-pattern "data/raw/test2026-06-13/*.xlsx" \
