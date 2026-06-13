@@ -5,8 +5,8 @@ A software and app seeking to predict geographic location or locale based on lin
 
 ```bash
 python -m src.cli prepare-data \
-  --input-pattern "data/raw/test2026-05-29/*.xlsx" \
-  --coord-csv "data/coordinate_dict/coordinate_dict2026-05-29.csv" \
+  --input-pattern "data/raw/test2026-06-13/*.xlsx" \
+  --coord-csv "data/raw/coordinate_dict/coordinate_dict2026-05-29.csv" \
   --output-csv "data/processed/cleaned_concatenated.csv"
 ```
 
@@ -34,6 +34,6 @@ If `data/processed/test_predictions.csv` already exists, the CLI will write a ne
 
 ```bash
 python -m src.cli plot-predictions \
-  --prediction-csv data/processed/test_predictions.csv \
+  --prediction-csv data/processed/filename.csv \
   --output-dir data/plots
 ```
